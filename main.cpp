@@ -16,6 +16,9 @@ QPushButton {
     padding-top: 4px;
     padding-bottom: 4px;
 }
+QPushButton:hover {
+    background-color: #5dade3;
+}
 
 QLabel{
     font-size: 16px;

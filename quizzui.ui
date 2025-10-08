@@ -16,15 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <layout class="QVBoxLayout" name="categoryContainer">
-      <item>
-       <widget class="QPushButton" name="pushButton">
-        <property name="text">
-         <string>PushButton</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <layout class="QVBoxLayout" name="categoryContainer"/>
     </item>
    </layout>
   </widget>
@@ -41,10 +33,12 @@
     <property name="title">
      <string>Quiz</string>
     </property>
+    <addaction name="actionNeues_Quiz"/>
     <addaction name="actionLaden"/>
     <addaction name="actionSpeichern"/>
-    <addaction name="actionStarten"/>
-    <addaction name="actionStopeen"/>
+    <addaction name="actionSpeichern_unter"/>
+    <addaction name="separator"/>
+    <addaction name="actionStartenStoppen"/>
    </widget>
    <addaction name="menuQuiz"/>
   </widget>
@@ -59,14 +53,19 @@
     <string>Speichern</string>
    </property>
   </action>
-  <action name="actionStarten">
+  <action name="actionStartenStoppen">
    <property name="text">
     <string>Starten</string>
    </property>
   </action>
-  <action name="actionStopeen">
+  <action name="actionSpeichern_unter">
    <property name="text">
-    <string>Stoppen</string>
+    <string>Speichern unter ...</string>
+   </property>
+  </action>
+  <action name="actionNeues_Quiz">
+   <property name="text">
+    <string>Neues Quiz</string>
    </property>
   </action>
  </widget>

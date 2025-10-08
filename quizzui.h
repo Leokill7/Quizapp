@@ -21,6 +21,7 @@ class QuizzUI : public QMainWindow
 public:
     QuizzUI(QWidget *parent = nullptr);
     ~QuizzUI();
+    void saveAs();
     void generatePlayerSelectorUI(QVBoxLayout *container);
     void showPlayerStats(QHBoxLayout *container);
     void showQuizScreen();
@@ -35,11 +36,16 @@ public:
     bool isAudio(QString filetype);
     QPushButton* createMiniButton(QString buttonText);
     QVBoxLayout* createMediaPlayer(QString mediaSource);
-
+    void createMediaProgressSlider(QBoxLayout* container);
+    void addVolumeSlider(QBoxLayout* container, QAudioOutput* audioOutput);
+    void addHSpacer(QBoxLayout* container);
+    void addVSpacer(QBoxLayout* container);
+    void closeEvent(QCloseEvent *event) override;
 private:
     Ui::QuizzUI *ui;
     Quiz* quiz = new Quiz();
     QMediaPlayer *player = nullptr;
     int mediaVolume = 50;
+    bool quizStarted = false;
 };
 #endif // QUIZZUI_H

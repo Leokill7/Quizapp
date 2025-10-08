@@ -5,6 +5,10 @@
 #include <QJsonArray>
 #include <QStandardPaths>
 #include <QFile>
+#include <QRandomGenerator>
+#include <QSettings>
+#include <QDir>
+#include <qwidget.h>
 Quiz::Quiz() {}
 
 void Quiz::addCategory(QString categoryName)
@@ -32,11 +36,34 @@ void Quiz::removePlayer(int index)
     players.removeAt(index);
 }
 
-void Quiz::saveQuiz(QString quizname)
+void Quiz::save(QString savePath)
 {
-    if(quizname == ""){
-        quizname = "NeuesQuiz";
+    if(savePath == ""){
+        return;
     }
+    deleteFolder(savePath);
+    QDir dir;
+    if(!dir.exists(savePath)){
+        dir.mkpath(savePath);
+    }
+
+    for(int i = 0; i < categories.size(); i++){
+        for(int j = 0; j  < categories[i]->getQuestions().size();j++){
+            Question* currQuestion = categories.at(i)->getQuestions().at(j);
+
+            if(currQuestion->getContentSource() != ""){
+
+                QString contentFileName = QFileInfo(currQuestion->getContentSource()).fileName();
+                QString contentFileDest = QDir(savePath).filePath(contentFileName);
+                QFile::copy(currQuestion->getContentSource(), contentFileDest);
+                currQuestion->getContentSource() = contentFileDest;
+            }
+        }
+    }
+
+    QString fileInfoPath = savePath + "/quizInfo.json";
+
+    QFile file(fileInfoPath);
 
     QJsonObject quizJson;
 
@@ -73,8 +100,6 @@ void Quiz::saveQuiz(QString quizname)
 
     QJsonDocument jsonDoc(quizJson);
 
-    QString documentsPath = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-    QFile file(documentsPath + "/" + quizname + ".json");
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qWarning("Couldn't open file for writing.");
         return;
@@ -84,10 +109,9 @@ void Quiz::saveQuiz(QString quizname)
     file.close();
 }
 
-void Quiz::loadQuiz(QString filepath)
+void Quiz::load(QString folderPath)
 {
-    players.clear();
-    categories.clear();
+    QString filepath = folderPath + "/quizInfo.json";
 
     QFile datei(filepath);
     if (!datei.open(QIODevice::ReadOnly)){
@@ -96,6 +120,13 @@ void Quiz::loadQuiz(QString filepath)
     }
     QByteArray content = datei.readAll();
     datei.close();
+
+    QSettings settings("Yakoto","QuizApp");
+    settings.setValue("lastEditedQuiz",folderPath);
+
+    savePath = folderPath;
+    players.clear();
+    categories.clear();
 
     QJsonParseError parseError;
     QJsonDocument document = QJsonDocument::fromJson(content,&parseError);
@@ -128,3 +159,40 @@ QList<Player *> Quiz::getPlayers() const
     return players;
 }
 
+void Quiz::nextPlayer()
+{
+    if(currPlayerIndex +1 == players.size()){
+        currPlayerIndex = 0;
+    }else{
+        currPlayerIndex++;
+    }
+}
+
+int Quiz::getCurrPlayerIndex() const
+{
+    return currPlayerIndex;
+}
+
+void Quiz::randomizePlayers()
+{
+    for (int i = players.size() - 1; i > 0; --i) {
+        int j = QRandomGenerator::global()->bounded(i + 1); // 0 ≤ j ≤ i
+        players.swapItemsAt(i, j);
+    }
+}
+
+void Quiz::setSavePath(const QString &newSavePath)
+{
+    savePath = newSavePath;
+}
+
+QString Quiz::getSavePath() const
+{
+    return savePath;
+}
+
+void Quiz::deleteFolder(const QString &path)
+{
+    QDir dir(path);
+    dir.removeRecursively();
+}

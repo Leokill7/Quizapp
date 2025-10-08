@@ -8,6 +8,12 @@
 #include <QAudioOutput>
 #include <QSlider>
 #include <QVideoWidget>
+#include <QRandomGenerator>
+#include <QGuiApplication>
+#include <QScreen>
+#include <QSettings>
+#include <QFormLayout>
+
 QuizzUI::QuizzUI(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::QuizzUI)
@@ -15,65 +21,56 @@ QuizzUI::QuizzUI(QWidget *parent)
     ui->setupUi(this);
 
     quiz = new Quiz();
-    /*quiz->addPlayer("Vito");
-    quiz->addPlayer("Leonard");
-    quiz->addPlayer("Julian");
-
-    quiz->addCategory("Geschichte");
-    quiz->addCategory("Geographie");
-    quiz->addCategory("Mathematik");
-
-    quiz->getCategories()[0]->addQuestion("Wann war die französische Revolution?",100,"1779");
-    quiz->getCategories()[0]->getQuestions()[0]->setContentSource("C:\\Users\\Leonard\\Downloads\\deep-abstract-ambient_snowcap-401656.mp3");
-    quiz->getCategories()[0]->addQuestion("Wann war die französische Revolution?",100,"1779");
-    quiz->getCategories()[0]->getQuestions()[1]->setContentSource("C:\\Users\\Leonard\\Downloads\\xy.mp4");
-    quiz->getCategories()[0]->addQuestion("Wann war die französische Revolution?",100,"1779");
-
-    quiz->getCategories()[1]->addQuestion("Was ist 1+1",100,"2");
-    quiz->getCategories()[1]->addQuestion("Was ist 3*3*3?",200,"27");
-    quiz->getCategories()[1]->addQuestion("Was ist 4 zum Quadrat",300,"16");
-
-    quiz->getCategories()[2]->addQuestion("Wann war die französische Revolution?",100,"1779");
-    quiz->getCategories()[2]->addQuestion("Wann war die französische Revolution?",100,"1779");
-    quiz->getCategories()[2]->addQuestion("Wann war die französische Revolution?",100,"1779");*/
 
     //Nutzen zum fertig builden
     //"C:\Qt\6.9.1\mingw_64\bin\windeployqt.exe" Quizapp.exe
 
     setWindowTitle("Quizapp");
 
-    connect(ui->actionStarten, &QAction::triggered, this, [=](){startQuiz();});
-    connect(ui->actionStopeen, &QAction::triggered, this, [=](){
+    connect(ui->actionNeues_Quiz, &QAction::triggered, this, [=](){
         stopQuiz();
+        if(quiz->getSavePath() != ""){
+            quiz->save(quiz->getSavePath());
+        }else{
+            saveAs();
+        }
+        quiz = new Quiz();
+        startEditing();
+    });
+    connect(ui->actionStartenStoppen, &QAction::triggered, this, [=](){
+        if(quizStarted){
+            stopQuiz();
+        }else{
+            startQuiz();
+        }
+
     });
     connect(ui->actionSpeichern, &QAction::triggered, this, [=](){
-        QWidget* quizNameInputWidget = new QWidget();
-        quizNameInputWidget->setWindowModality(Qt::ApplicationModal);
-
-        QVBoxLayout* container = new QVBoxLayout(quizNameInputWidget);
-        QHBoxLayout* inputContainer = new QHBoxLayout();
-        QLabel* descrLabel = new QLabel("Quiz Name:");
-        QLineEdit* nameInput = new QLineEdit();
-        inputContainer->addWidget(descrLabel);
-        inputContainer->addWidget(nameInput);
-
-        QPushButton* saveButton = new QPushButton("Speichern");
-        connect(saveButton, &QPushButton::clicked, this, [=](){
-            quiz->saveQuiz(nameInput->text());
-            quizNameInputWidget->close();
-        });
-
-        container->addLayout(inputContainer);
-        container->addWidget(saveButton);
-        quizNameInputWidget->show();
+        if(quiz->getSavePath() != ""){
+            quiz->save(quiz->getSavePath());
+        }else{
+            saveAs();
+        }
+    });
+    connect(ui->actionSpeichern_unter, &QAction::triggered, this, [=](){
+        saveAs();
     });
     connect(ui->actionLaden, &QAction::triggered, this, [=](){
         stopQuiz();
         QString documentsPath = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-        QString fileName = QFileDialog::getOpenFileName(this,"Open File",documentsPath,"JSON Files (*.json);");
-        quiz->loadQuiz(fileName);
+        QString fileName = QFileDialog::getExistingDirectory(
+            this,
+            "Quiz laden",
+            documentsPath,
+            QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
+        );
+        quiz->load(fileName);
         startEditing();
     });
+
+    QSettings settings("Yakoto","QuizApp");
+    quiz->load(settings.value("lastEditedQuiz","").toString());
+    mediaVolume = settings.value("MediaVolume",50).toInt();
 
     startEditing();
 }
@@ -83,57 +80,60 @@ QuizzUI::~QuizzUI()
     delete ui;
 }
 
-void QuizzUI::showPlayerStats(QHBoxLayout *playerStatsHorizontalLayout)
+void QuizzUI::saveAs()
 {
-    clearLayout(playerStatsHorizontalLayout);
+    QString documentsPath = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    QString fileName = QFileDialog::getExistingDirectory(
+        this,
+        "Quiz speichern",
+        documentsPath,
+        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
+    );
+
+    quiz->save(fileName);
+}
+
+void QuizzUI::showPlayerStats(QHBoxLayout *playerStatsContainer)
+{
+    clearLayout(playerStatsContainer);
 
     QVBoxLayout* descrContainer = new QVBoxLayout();
-    QLabel* emptyLabel = new QLabel();
-    QLabel* pointsDescrLabel = new QLabel("Punkte");
-    QLabel* correctAnswersDescrLabel = new QLabel("Beantwortet");
-    descrContainer->addWidget(emptyLabel);
-    descrContainer->addWidget(pointsDescrLabel);
-    descrContainer->addWidget(correctAnswersDescrLabel);
-    playerStatsHorizontalLayout->addLayout(descrContainer);
+    descrContainer->addWidget(new QLabel());
+    descrContainer->addWidget(new QLabel("Punkte:"));
+    descrContainer->addWidget(new QLabel("Beantwortet:"));
+    playerStatsContainer->addLayout(descrContainer);
 
     for(int i = 0; i < quiz->getPlayers().size();i++){
         Player* currPlayer = quiz->getPlayers().at(i);
+        QWidget* playerStatsWidget = new QWidget();
         QVBoxLayout* playerStatsLayout = new QVBoxLayout();
 
-        QLabel* playerName = new QLabel(currPlayer->getName());
-        playerStatsLayout->addWidget(playerName, 0,Qt::AlignHCenter);
-
-        QHBoxLayout* playerPointsContainer = new QHBoxLayout();
-
-        QPushButton* reducePointsButton = createMiniButton("-");
-        connect(reducePointsButton, &QPushButton::clicked, this, [=](){
-            currPlayer->setPoints(currPlayer->getPoints()-100);
-            showPlayerStats(playerStatsHorizontalLayout);
-        });
-        playerPointsContainer->addWidget(reducePointsButton);
+        playerStatsLayout->addWidget(new QLabel(currPlayer->getName()), 0,Qt::AlignHCenter);
 
         QLabel* pointsLabel = new QLabel(QString::number(currPlayer->getPoints()));
-        playerPointsContainer->addWidget(pointsLabel, 0,Qt::AlignHCenter);
-
-        QPushButton* addPointsButton = createMiniButton("+");
-        connect(addPointsButton, &QPushButton::clicked, this, [=](){
-            currPlayer->setPoints(currPlayer->getPoints()+100);
-            showPlayerStats(playerStatsHorizontalLayout);
-        });
-        playerPointsContainer->addWidget(addPointsButton);
-
-        playerStatsLayout->addLayout(playerPointsContainer);
-        playerStatsHorizontalLayout->addLayout(playerStatsLayout);
+        playerStatsLayout->addWidget(pointsLabel, 0,Qt::AlignHCenter);
 
         QLabel* correctAnswersLabel = new QLabel(QString::number(currPlayer->getCorrectAnswers()));
         playerStatsLayout->addWidget(correctAnswersLabel, 0,Qt::AlignHCenter);
+
+        playerStatsWidget->setLayout(playerStatsLayout);
+        if(quiz->getCurrPlayerIndex() == i){
+            playerStatsWidget->setStyleSheet("QWidget { background-color: lightgrey; }");
+        }
+        playerStatsContainer->addWidget(playerStatsWidget);
+
     }
 
-    playerStatsHorizontalLayout->addSpacerItem(new QSpacerItem( 40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
+    addHSpacer(playerStatsContainer);
 }
 void QuizzUI::startQuiz()
 {
+    quizStarted = true;
+    ui->actionStartenStoppen->setText("Stoppen");
+
     clearLayout(ui->categoryContainer);
+
+    quiz->randomizePlayers();
 
     QHBoxLayout* categories = new QHBoxLayout();
     QHBoxLayout* playerStatsHorizontalLayout = new QHBoxLayout();
@@ -143,12 +143,16 @@ void QuizzUI::startQuiz()
 
         QVBoxLayout* container = new QVBoxLayout();
         QLabel* categoryName = new QLabel(currCategory->getName());
+        categoryName->setWordWrap(true);
+        categoryName->setStyleSheet("QLabel { font-size: 26px; }");
         container->addWidget(categoryName, 0,Qt::AlignHCenter);
 
         for(int j = 0; j < currCategory->getQuestions().size();j++){
             Question* currQuestion = currCategory->getQuestions().at(j);
 
             QPushButton* selectQuestionButton = new QPushButton(QString::number(currQuestion->getPoints()));
+            selectQuestionButton->setStyleSheet("QPushButton { font-size: 26px; }");
+            selectQuestionButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
             if(currQuestion->getAnswered()){
                 selectQuestionButton->setDisabled(true);
             }
@@ -160,18 +164,20 @@ void QuizzUI::startQuiz()
                 ui->categoryContainer->addLayout(questionContainer);
 
                 QLabel* questionDescr = new QLabel(currCategory->getName() + " "+ QString::number(currQuestion->getPoints()));
-                questionDescr->setMaximumHeight(40);
-                questionContainer->addWidget(questionDescr, 0,Qt::AlignTop | Qt::AlignHCenter);
+                questionContainer->addWidget(questionDescr, 0,Qt::AlignHCenter);
 
                 QLabel* questionText = new QLabel(currQuestion->getQuestionText());
+                questionText->setWordWrap(true);
                 questionText->setProperty("class", "question");
-                questionContainer->addWidget(questionText, 0,Qt::AlignTop | Qt::AlignHCenter);
+                questionContainer->addWidget(questionText, 0, Qt::AlignHCenter);
 
                 if (isImage(currQuestion->getContentSource()))
                 {
                     QLabel* imageLabel = new QLabel("");
+                    int screenHeight = QGuiApplication::primaryScreen()->size().height();
+                    int screenWidth  = QGuiApplication::primaryScreen()->size().width();
                     QPixmap pix(currQuestion->getContentSource());
-                    imageLabel->setPixmap(pix);
+                    imageLabel->setPixmap(pix.scaled(QSize(screenWidth, screenHeight/2), Qt::KeepAspectRatio, Qt::SmoothTransformation));
                     questionContainer->addWidget(imageLabel, 0,Qt::AlignHCenter);
                 }else if (isAudio(currQuestion->getContentSource())||isVideo(currQuestion->getContentSource())){
                     QVBoxLayout* mediaPlayerLayout = createMediaPlayer(currQuestion->getContentSource());
@@ -181,16 +187,23 @@ void QuizzUI::startQuiz()
 
                 if(currQuestion->getAnswer() != ""){
                     QLabel* answerText = new QLabel(currQuestion->getAnswer());
+                    answerText->setWordWrap(true);
                     answerText->setVisible(false);
                     answerText->setProperty("class", "question");
+                    answerText->setMinimumHeight(50);
+
+                    questionContainer->addWidget(answerText, 0,Qt::AlignBottom | Qt::AlignHCenter);
+
                     QPushButton* revealAnserButton = new QPushButton("Antwort");
                     connect(revealAnserButton, &QPushButton::clicked, this, [=](){
                         revealAnserButton->setVisible(false);
                         answerText->setVisible(true);
                     });
+                    revealAnserButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+                    revealAnserButton->setStyleSheet("QPushButton { padding: 4px 40px; }");
+                    revealAnserButton->setMinimumHeight(50);
 
-                    questionContainer->addWidget(answerText, 0,Qt::AlignHCenter);
-                    questionContainer->addWidget(revealAnserButton);
+                    questionContainer->addWidget(revealAnserButton, 0,Qt::AlignBottom | Qt::AlignHCenter);
                 }
 
                 QHBoxLayout* playersContainer = new QHBoxLayout();
@@ -202,6 +215,7 @@ void QuizzUI::startQuiz()
                         currPlayer->addPoints(currQuestion->getPoints());
                         currPlayer->addCorrectAnswer();
                         currQuestion->setAnswered(true);
+                        quiz->nextPlayer();
                         startQuiz();
                     });
                     playersContainer->addWidget(setWinningPlayerButton);
@@ -209,14 +223,17 @@ void QuizzUI::startQuiz()
                 QPushButton* noWinnerButton = new QPushButton("Keiner");
                 connect(noWinnerButton, &QPushButton::clicked, this, [=](){
                     currQuestion->setAnswered(true);
+                    quiz->nextPlayer();
                     startQuiz();
                 });
                 playersContainer->addWidget(noWinnerButton);
                 questionContainer->addLayout(playersContainer);
 
-                QPushButton* saveButton = new QPushButton("Abbrechen");
-                questionContainer->addWidget(saveButton);
-                connect(saveButton, &QPushButton::clicked, this, [=](){
+                QPushButton* cancelButton = new QPushButton("Abbrechen");
+                cancelButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+                cancelButton->setStyleSheet("QPushButton { padding: 4px 40px; }");
+                questionContainer->addWidget(cancelButton, 0,Qt::AlignHCenter);
+                connect(cancelButton, &QPushButton::clicked, this, [=](){
                     startQuiz();
                 });
             });
@@ -224,7 +241,7 @@ void QuizzUI::startQuiz()
             container->addWidget(selectQuestionButton);
         }
 
-        container->addSpacerItem(new QSpacerItem( 40, 20, QSizePolicy::Minimum, QSizePolicy::Expanding));
+        addVSpacer(container);
 
         categories->addLayout(container);
     }
@@ -236,6 +253,9 @@ void QuizzUI::startQuiz()
 
 void QuizzUI::stopQuiz()
 {
+    quizStarted = false;
+    ui->actionStartenStoppen->setText("Starten");
+
     for(int i = 0; i < quiz->getPlayers().size();i++){
         quiz->getPlayers().at(i)->setPoints(0);
         quiz->getPlayers().at(i)->setCorrectAnswers(0);
@@ -261,7 +281,10 @@ void QuizzUI::startEditing()
         QVBoxLayout* container = new QVBoxLayout();
         QHBoxLayout* headerContainer = new QHBoxLayout();
         QLabel* categoryName = new QLabel(currCategory->getName());
-        QPushButton* removeCategoryButton = createMiniButton("-");
+        categoryName->setWordWrap(true);
+        categoryName->setStyleSheet("QLabel { font-size: 26px; }");
+        QPushButton* removeCategoryButton = createMiniButton("X");
+        removeCategoryButton->setStyleSheet("QPushButton { background-color: #ff7f7f; }");
 
         connect(removeCategoryButton, &QPushButton::clicked, this, [=](){
             quiz->removeCategory(i);
@@ -278,6 +301,8 @@ void QuizzUI::startEditing()
 
             QHBoxLayout* questionContainer = new QHBoxLayout();
             QPushButton* selectQuestionButton = new QPushButton(QString::number(currQuestion->getPoints()));
+            selectQuestionButton->setStyleSheet("QPushButton { font-size: 26px; }");
+            selectQuestionButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
             connect(selectQuestionButton, &QPushButton::clicked, this, [=](){
                 Question* questionToEdit = quiz->getCategories().at(i)->getQuestions()[j];
 
@@ -287,7 +312,8 @@ void QuizzUI::startEditing()
             });
             questionContainer->addWidget(selectQuestionButton);
 
-            QPushButton* removeQuestionButton = createMiniButton("-");
+            QPushButton* removeQuestionButton = createMiniButton("X");
+            removeQuestionButton->setStyleSheet("QPushButton { background-color: #ff7f7f; }");
             connect(removeQuestionButton, &QPushButton::clicked, this, [=](){
                 quiz->getCategories().at(i)->removeQuestion(j);
                 startEditing();
@@ -296,25 +322,27 @@ void QuizzUI::startEditing()
             container->addLayout(questionContainer);
         }
 
-        QPushButton* addQuestionButton = new QPushButton("Frage hinzufügen");
+        QPushButton* addQuestionButton = new QPushButton("Neue Frage");
+        addQuestionButton->setStyleSheet("QPushButton { padding: 4px 40px; }");
         connect(addQuestionButton, &QPushButton::clicked, this, [=](){
             questionEditingMenu(nullptr, i);
             startEditing();
         });
         container->addWidget(addQuestionButton);
 
-        container->addSpacerItem(new QSpacerItem( 40, 20, QSizePolicy::Minimum, QSizePolicy::Expanding));
+        addVSpacer(container);
 
         categories->addLayout(container);
     }
 
     QVBoxLayout* addCategoryContainer = new QVBoxLayout();
-    QPushButton* addCategoryButton = new QPushButton("Kategorie hinzufügen");
+    QPushButton* addCategoryButton = new QPushButton("Neue Kategorie");
+    addCategoryButton->setStyleSheet("QPushButton { padding: 4px 40px; }");
     connect(addCategoryButton, &QPushButton::clicked, this, [=](){
         addCategory();
     });
     addCategoryContainer->addWidget(addCategoryButton);
-    addCategoryContainer->addSpacerItem(new QSpacerItem( 40, 20, QSizePolicy::Minimum, QSizePolicy::Expanding));
+    addVSpacer(addCategoryContainer);
     categories->addLayout(addCategoryContainer);
     ui->categoryContainer->addLayout(categories);
 
@@ -335,9 +363,9 @@ void QuizzUI::startEditing()
     for(int i = 0; i < quiz->getPlayers().size();i++){
         Player* currPlayer = quiz->getPlayers().at(i);
 
-        QLabel* playername = new QLabel(currPlayer->getName());
-        playersContainer->addWidget(playername,0,Qt::AlignRight);
-        QPushButton* removePlayerButton = createMiniButton("-");
+        playersContainer->addWidget(new QLabel(currPlayer->getName()), 0, Qt::AlignRight);
+        QPushButton* removePlayerButton = createMiniButton("X");
+        removePlayerButton->setStyleSheet("QPushButton { background-color: #ff7f7f; }");
         connect(removePlayerButton, &QPushButton::clicked, this, [=](){
             quiz->removePlayer(i);
             startEditing();
@@ -345,39 +373,34 @@ void QuizzUI::startEditing()
         playersContainer->addWidget(removePlayerButton);
     }
 
+    addHSpacer(playersContainer);
+
     ui->categoryContainer->addLayout(playersContainer);
 }
 
 void QuizzUI::questionEditingMenu(Question *questionToEdit, int categoryIndex)
 {
     QWidget* questionOptions = new QWidget();
+    questionOptions->setWindowTitle("Frage bearbeiten");
     questionOptions->setWindowModality(Qt::ApplicationModal);
 
     QVBoxLayout* container = new QVBoxLayout(questionOptions);
 
-    QHBoxLayout* questionInputContainer = new QHBoxLayout();
-    QLabel* questionLabel = new QLabel("Frage");
-    questionInputContainer->addWidget(questionLabel);
+    QFormLayout *formLayout = new QFormLayout();
+    container->addLayout(formLayout);
+
     QLineEdit* questionInput= new QLineEdit();
     questionInput->setText(questionToEdit?questionToEdit->getQuestionText():"");
-    questionInputContainer->addWidget(questionInput);
-    container->addLayout(questionInputContainer);
+    formLayout->addRow(new QLabel("Frage:"),questionInput);
 
-    QHBoxLayout* answerInputContainer = new QHBoxLayout();
-    QLabel* answerlabel = new QLabel("Antwort");
-    answerInputContainer->addWidget(answerlabel);
     QLineEdit* answerInput= new QLineEdit();
     answerInput->setText(questionToEdit?questionToEdit->getAnswer():"");
-    answerInputContainer->addWidget(answerInput);
-    container->addLayout(answerInputContainer);
+    formLayout->addRow(new QLabel("Antwort:"), answerInput);
 
-    QHBoxLayout* pointsInputContainer = new QHBoxLayout();
-    QLabel* pointsLabel = new QLabel("Punkte");
-    pointsInputContainer->addWidget(pointsLabel);
     QLineEdit* pointsInput= new QLineEdit();
     pointsInput->setText(QString::number(questionToEdit?questionToEdit->getPoints():0));
-    pointsInputContainer->addWidget(pointsInput);
-    container->addLayout(pointsInputContainer);
+    formLayout->addRow(new QLabel("Punkte:"), pointsInput);
+
 
     QPushButton* addMediaButton = new QPushButton("Medien hinzufügen");
     QLabel* mediaSourceLabel = new QLabel();
@@ -418,7 +441,7 @@ void QuizzUI::questionEditingMenu(Question *questionToEdit, int categoryIndex)
 }
 
 void QuizzUI::clearLayout(QLayout *layout) {
-    //Pevent crsahing when deleting player while running
+    //Pevent crsahing when deleting mediaplayer while running
     if(player){
         player->stop();
     }
@@ -533,12 +556,50 @@ QVBoxLayout *QuizzUI::createMediaPlayer(QString mediaSource)
         QVideoWidget *videoWidget = new QVideoWidget(this);
         player->setVideoOutput(videoWidget);
         videoWidget->setAspectRatioMode(Qt::KeepAspectRatio);
-        videoWidget->setMinimumHeight(480);
-        videoWidget->setMinimumWidth(854);
+        int screenHeight = QGuiApplication::primaryScreen()->size().height();
+        int screenWidth  = QGuiApplication::primaryScreen()->size().width();
+        videoWidget->setMaximumWidth(screenWidth);
+        videoWidget->setMaximumHeight(screenHeight/2);
+        videoWidget->setMinimumHeight(screenHeight/2);
+        videoWidget->setMinimumWidth(screenWidth);
         container->addWidget(videoWidget);
     }
 
+    createMediaProgressSlider(container);
 
+    QHBoxLayout* playerContainer = new QHBoxLayout();
+
+    QPushButton *restartButton = new QPushButton();
+    restartButton->setFixedSize(30,30);
+    restartButton->setIcon(style()->standardIcon(QStyle::SP_MediaSkipBackward));
+    connect(restartButton, &QPushButton::clicked, this, [=](){
+        player->setPosition(0);
+    });
+    playerContainer->addWidget(restartButton, 0,Qt::AlignLeft);
+
+    QPushButton* playPauseButton = new QPushButton();
+    playPauseButton->setFixedSize(30,30);
+    playPauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+    connect(playPauseButton, &QPushButton::clicked, this, [=](){
+        if(player->isPlaying()){
+            player->pause();
+            playPauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+        }else{
+            player->play();
+            playPauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
+        }
+    });
+    playerContainer->addWidget(playPauseButton, 0,Qt::AlignCenter);
+
+    addVolumeSlider(playerContainer,audioOutput);
+
+    container->addLayout(playerContainer);
+
+    return container;
+}
+
+void QuizzUI::createMediaProgressSlider(QBoxLayout *container)
+{
     QSlider *progressSlider = new QSlider(Qt::Horizontal, this);
     progressSlider->setRange(0, 1000);
     container->addWidget(progressSlider);
@@ -555,38 +616,16 @@ QVBoxLayout *QuizzUI::createMediaPlayer(QString mediaSource)
         qint64 duration = player->duration();
         player->setPosition(value * duration / 1000);
     });
+}
 
-
-    QHBoxLayout* playerContainer = new QHBoxLayout();
-
-    QPushButton *restartButton = new QPushButton();
-    restartButton->setFixedSize(30,30);
-    restartButton->setIcon(style()->standardIcon(QStyle::SP_MediaSkipBackward));
-    connect(restartButton, &QPushButton::clicked, this, [=](){
-        player->setPosition(0);
-    });
-    playerContainer->addWidget(restartButton);
-    playerContainer->addSpacerItem(new QSpacerItem( 40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
-
-    QPushButton* playPauseButton = new QPushButton();
-    playPauseButton->setFixedSize(30,30);
-    playPauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
-    connect(playPauseButton, &QPushButton::clicked, this, [=](){
-        if(player->isPlaying()){
-            player->pause();
-            playPauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
-        }else{
-            player->play();
-            playPauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
-        }
-    });
-    playerContainer->addWidget(playPauseButton);
-    playerContainer->addSpacerItem(new QSpacerItem( 40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
-
+void QuizzUI::addVolumeSlider(QBoxLayout *container, QAudioOutput* audioOutput)
+{
+    QWidget* columeSliderWidget = new QWidget();
+    QHBoxLayout* volumeSliderContainer = new QHBoxLayout(columeSliderWidget);
     QLabel* muteIcon = new QLabel();
     QPixmap pixMute = style()->standardIcon(QStyle::SP_MediaVolumeMuted).pixmap(32, 32);
     muteIcon->setPixmap(pixMute);
-    playerContainer->addWidget(muteIcon);
+    volumeSliderContainer->addWidget(muteIcon);
 
     QSlider *volumeSlider = new QSlider(Qt::Horizontal, this);
     volumeSlider->setMaximumWidth(100);
@@ -596,17 +635,36 @@ QVBoxLayout *QuizzUI::createMediaPlayer(QString mediaSource)
     connect(volumeSlider, &QSlider::valueChanged, this, [=](int value){
         audioOutput->setVolume(value / 100.0);
         mediaVolume = value;
+        QSettings settings("Yakoto","QuizApp");
+        settings.setValue("MediaVolume",mediaVolume);
     });
-    playerContainer->addWidget(volumeSlider);
+    volumeSliderContainer->addWidget(volumeSlider, 0,Qt::AlignRight);
 
     QLabel* fullVolumeIcon = new QLabel();
     QPixmap pixFullVolume = style()->standardIcon(QStyle::SP_MediaVolume).pixmap(32, 32);
     fullVolumeIcon->setPixmap(pixFullVolume);
-    playerContainer->addWidget(fullVolumeIcon);
+    volumeSliderContainer->addWidget(fullVolumeIcon);
 
-    container->addLayout(playerContainer);
-
-    return container;
+    container->addWidget(columeSliderWidget, 0,Qt::AlignRight);
 }
 
+void QuizzUI::addHSpacer(QBoxLayout *container)
+{
+    container->addSpacerItem(new QSpacerItem( 40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
+}
+
+void QuizzUI::addVSpacer(QBoxLayout *container)
+{
+    container->addSpacerItem(new QSpacerItem( 40, 20, QSizePolicy::Minimum, QSizePolicy::Expanding));
+}
+void QuizzUI::closeEvent(QCloseEvent *event)
+{
+    if(quiz->getSavePath() != ""){
+        quiz->save(quiz->getSavePath());
+    }else{
+        saveAs();
+    }
+
+    event->accept(); // App darf beendet werden
+}
 
