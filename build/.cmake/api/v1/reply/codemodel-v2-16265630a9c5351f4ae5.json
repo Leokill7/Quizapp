@@ -1,0 +1,79 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Release-a8ff0af8fe036f63c25c.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Quizapp",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "Quizapp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Quizapp-Release-dd60933c984e7bb3a449.json",
+					"name" : "Quizapp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Quizapp_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Quizapp_autogen-Release-18dcc299e58226652cdc.json",
+					"name" : "Quizapp_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Quizapp_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Quizapp_autogen_timestamp_deps-Release-12e3fb8db9a67e3eef58.json",
+					"name" : "Quizapp_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/Leonard/Desktop/Stuff/Projekte/Quizapp/build",
+		"source" : "C:/Users/Leonard/Desktop/Stuff/Projekte/Quizapp"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

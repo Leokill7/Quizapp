@@ -1,0 +1,13 @@
+# ninja log v6
+8	499	7816579561260552	Quizapp_autogen/timestamp	82b6d7530c9a3983
+8	499	7816579561260552	Quizapp_autogen/mocs_compilation.cpp	82b6d7530c9a3983
+8	499	7816579561260552	C:/Users/Leonard/Desktop/Stuff/Projekte/Quizapp/build/Quizapp_autogen/timestamp	82b6d7530c9a3983
+8	499	7816579561260552	C:/Users/Leonard/Desktop/Stuff/Projekte/Quizapp/build/Quizapp_autogen/mocs_compilation.cpp	82b6d7530c9a3983
+508	1399	7816579561870621	CMakeFiles/Quizapp.dir/question.cpp.obj	a70667bd7aa0d795
+513	1415	7816579561920625	CMakeFiles/Quizapp.dir/player.cpp.obj	bfd5d5c002fe4510
+511	1515	7816579561910628	CMakeFiles/Quizapp.dir/category.cpp.obj	3f3e2a993716317d
+502	2033	7816579561810613	CMakeFiles/Quizapp.dir/Quizapp_autogen/mocs_compilation.cpp.obj	3051e31a4f46b8e1
+505	2034	7816579561840614	CMakeFiles/Quizapp.dir/main.cpp.obj	89f6e7ac116be929
+510	2670	7816579561890641	CMakeFiles/Quizapp.dir/quiz.cpp.obj	d496fc7f2bf35032
+506	2997	7816579561850636	CMakeFiles/Quizapp.dir/quizzui.cpp.obj	1222b84923208304
+2997	3097	7816579586766375	Quizapp.exe	6fd5632a8498010b

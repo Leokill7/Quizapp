@@ -1,0 +1,9 @@
+C:/Users/Leonard/Desktop/Stuff/Projekte/Quizapp/build/CMakeFiles/Quizapp.dir
+C:/Users/Leonard/Desktop/Stuff/Projekte/Quizapp/build/CMakeFiles/edit_cache.dir
+C:/Users/Leonard/Desktop/Stuff/Projekte/Quizapp/build/CMakeFiles/rebuild_cache.dir
+C:/Users/Leonard/Desktop/Stuff/Projekte/Quizapp/build/CMakeFiles/list_install_components.dir
+C:/Users/Leonard/Desktop/Stuff/Projekte/Quizapp/build/CMakeFiles/install.dir
+C:/Users/Leonard/Desktop/Stuff/Projekte/Quizapp/build/CMakeFiles/install/local.dir
+C:/Users/Leonard/Desktop/Stuff/Projekte/Quizapp/build/CMakeFiles/install/strip.dir
+C:/Users/Leonard/Desktop/Stuff/Projekte/Quizapp/build/CMakeFiles/Quizapp_autogen_timestamp_deps.dir
+C:/Users/Leonard/Desktop/Stuff/Projekte/Quizapp/build/CMakeFiles/Quizapp_autogen.dir
