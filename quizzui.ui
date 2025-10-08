@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QuizzUI</class>
+ <widget class="QMainWindow" name="QuizzUI">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>QuizzUI</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QVBoxLayout" name="categoryContainer">
+      <item>
+       <widget class="QPushButton" name="pushButton">
+        <property name="text">
+         <string>PushButton</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuQuiz">
+    <property name="title">
+     <string>Quiz</string>
+    </property>
+    <addaction name="actionLaden"/>
+    <addaction name="actionSpeichern"/>
+    <addaction name="actionStarten"/>
+    <addaction name="actionStopeen"/>
+   </widget>
+   <addaction name="menuQuiz"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionLaden">
+   <property name="text">
+    <string>Laden</string>
+   </property>
+  </action>
+  <action name="actionSpeichern">
+   <property name="text">
+    <string>Speichern</string>
+   </property>
+  </action>
+  <action name="actionStarten">
+   <property name="text">
+    <string>Starten</string>
+   </property>
+  </action>
+  <action name="actionStopeen">
+   <property name="text">
+    <string>Stoppen</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

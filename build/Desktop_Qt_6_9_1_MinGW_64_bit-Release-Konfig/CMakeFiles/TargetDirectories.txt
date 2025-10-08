@@ -1,0 +1,9 @@
+C:/Users/Leonard/Documents/MaltesQuizapp/build/Desktop_Qt_6_9_1_MinGW_64_bit-Release-Konfig/CMakeFiles/MaltesQuizapp.dir
+C:/Users/Leonard/Documents/MaltesQuizapp/build/Desktop_Qt_6_9_1_MinGW_64_bit-Release-Konfig/CMakeFiles/edit_cache.dir
+C:/Users/Leonard/Documents/MaltesQuizapp/build/Desktop_Qt_6_9_1_MinGW_64_bit-Release-Konfig/CMakeFiles/rebuild_cache.dir
+C:/Users/Leonard/Documents/MaltesQuizapp/build/Desktop_Qt_6_9_1_MinGW_64_bit-Release-Konfig/CMakeFiles/list_install_components.dir
+C:/Users/Leonard/Documents/MaltesQuizapp/build/Desktop_Qt_6_9_1_MinGW_64_bit-Release-Konfig/CMakeFiles/install.dir
+C:/Users/Leonard/Documents/MaltesQuizapp/build/Desktop_Qt_6_9_1_MinGW_64_bit-Release-Konfig/CMakeFiles/install/local.dir
+C:/Users/Leonard/Documents/MaltesQuizapp/build/Desktop_Qt_6_9_1_MinGW_64_bit-Release-Konfig/CMakeFiles/install/strip.dir
+C:/Users/Leonard/Documents/MaltesQuizapp/build/Desktop_Qt_6_9_1_MinGW_64_bit-Release-Konfig/CMakeFiles/MaltesQuizapp_autogen_timestamp_deps.dir
+C:/Users/Leonard/Documents/MaltesQuizapp/build/Desktop_Qt_6_9_1_MinGW_64_bit-Release-Konfig/CMakeFiles/MaltesQuizapp_autogen.dir

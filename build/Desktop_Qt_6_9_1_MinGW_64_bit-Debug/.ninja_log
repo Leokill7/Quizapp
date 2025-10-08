@@ -1,0 +1,22 @@
+# ninja log v6
+25	151	7803458338845107	C:/Users/Leonard/Documents/MaltesQuizapp/build/Desktop_Qt_6_9_1_MinGW_64_bit-Debug/MaltesQuizapp_autogen/mocs_compilation.cpp	644658e57cee2d62
+25	151	7803458338845107	MaltesQuizapp_autogen/mocs_compilation.cpp	644658e57cee2d62
+541	2198	7802836760989295	CMakeFiles/MaltesQuizapp.dir/main.cpp.obj	43fad078d91d069
+25	151	7803458338845107	MaltesQuizapp_autogen/timestamp	644658e57cee2d62
+686	1765	7801870421725337	CMakeFiles/MaltesQuizapp.dir/category.cpp.obj	1e877c421e3510c9
+25	151	7803458338845107	C:/Users/Leonard/Documents/MaltesQuizapp/build/Desktop_Qt_6_9_1_MinGW_64_bit-Debug/MaltesQuizapp_autogen/timestamp	644658e57cee2d62
+681	1642	7801870421675340	CMakeFiles/MaltesQuizapp.dir/question.cpp.obj	888be4e3e3841cf8
+2251	2490	7803458361098717	MaltesQuizapp.exe	105abfb6468a9d11
+501	1537	7801617313301102	CMakeFiles/MaltesQuizapp.dir/player.cpp.obj	54ad26409d16fab2
+539	2225	7802836760959295	CMakeFiles/MaltesQuizapp.dir/MaltesQuizapp_autogen/mocs_compilation.cpp.obj	a6e276f062b373f8
+683	2607	7801870421695338	CMakeFiles/MaltesQuizapp.dir/quiz.cpp.obj	dbfba7409c594053
+152	2251	7803458340108716	CMakeFiles/MaltesQuizapp.dir/quizzui.cpp.obj	ea6ba3442335d7c5
+451	1950	7801664226623726	CMakeFiles/MaltesQuizapp.dir/questionwidget.cpp.obj	f2a63b893ff53a44
+17	687	7803470432935333	build.ninja	6421844c5e3bd581
+22	114	7803470434245330	MaltesQuizapp_autogen/timestamp	644658e57cee2d62
+22	114	7803470434245330	MaltesQuizapp_autogen/mocs_compilation.cpp	644658e57cee2d62
+22	114	7803470434245330	C:/Users/Leonard/Documents/MaltesQuizapp/build/Desktop_Qt_6_9_1_MinGW_64_bit-Debug/MaltesQuizapp_autogen/timestamp	644658e57cee2d62
+22	114	7803470434245330	C:/Users/Leonard/Documents/MaltesQuizapp/build/Desktop_Qt_6_9_1_MinGW_64_bit-Debug/MaltesQuizapp_autogen/mocs_compilation.cpp	644658e57cee2d62
+114	1519	7803470434715331	CMakeFiles/MaltesQuizapp.dir/MaltesQuizapp_autogen/mocs_compilation.cpp.obj	a6e276f062b373f8
+116	2282	7803470434735336	CMakeFiles/MaltesQuizapp.dir/quizzui.cpp.obj	ea6ba3442335d7c5
+2282	2524	7803470456394957	MaltesQuizapp.exe	f41f39ccc15022f6

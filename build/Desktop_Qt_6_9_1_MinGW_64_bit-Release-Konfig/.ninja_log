@@ -1,0 +1,13 @@
+# ninja log v6
+9	682	7803472154190485	MaltesQuizapp_autogen/timestamp	34da9802530edf22
+9	682	7803472154190485	MaltesQuizapp_autogen/mocs_compilation.cpp	34da9802530edf22
+9	682	7803472154190485	C:/Users/Leonard/Documents/MaltesQuizapp/build/Desktop_Qt_6_9_1_MinGW_64_bit-Release-Konfig/MaltesQuizapp_autogen/timestamp	34da9802530edf22
+9	682	7803472154190485	C:/Users/Leonard/Documents/MaltesQuizapp/build/Desktop_Qt_6_9_1_MinGW_64_bit-Release-Konfig/MaltesQuizapp_autogen/mocs_compilation.cpp	34da9802530edf22
+696	1903	7803472155050484	CMakeFiles/MaltesQuizapp.dir/question.cpp.obj	f43ee0b312dec3c1
+703	1932	7803472155130485	CMakeFiles/MaltesQuizapp.dir/player.cpp.obj	ad788f1d8545300a
+701	2027	7803472155100480	CMakeFiles/MaltesQuizapp.dir/category.cpp.obj	a489ca099c587923
+688	2719	7803472154970487	CMakeFiles/MaltesQuizapp.dir/MaltesQuizapp_autogen/mocs_compilation.cpp.obj	445b188380f225a
+691	2729	7803472155000484	CMakeFiles/MaltesQuizapp.dir/main.cpp.obj	15fc1a3d3cdcbb9b
+698	3176	7803472155080493	CMakeFiles/MaltesQuizapp.dir/quiz.cpp.obj	55d7d0787f8e2909
+693	3986	7803472155030481	CMakeFiles/MaltesQuizapp.dir/quizzui.cpp.obj	710d558ed75e70f2
+3987	4119	7803472187963561	MaltesQuizapp.exe	d4a8ba41b5a7c830
